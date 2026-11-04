@@ -68,6 +68,7 @@ def _user_payload(token: str, user: User) -> dict:
 
 
 @router.get("/")
+@router.get("/session")
 async def get_session_user(current_user: User = Depends(get_current_user)):
     """Return current session user — UI getSessionUser."""
     return {

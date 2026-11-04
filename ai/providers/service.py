@@ -39,6 +39,7 @@ _STANDARD_PARAMS = {
     "top_p",
     "top_k",
     "max_tokens",
+    "max_completion_tokens",
     "frequency_penalty",
     "presence_penalty",
     "stop",

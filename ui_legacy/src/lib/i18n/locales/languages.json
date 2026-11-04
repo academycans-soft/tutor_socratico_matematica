@@ -1,0 +1,18 @@
+[
+	{
+		"code": "en-US",
+		"title": "English (US)"
+	},
+	{
+		"code": "es-ES",
+		"title": "Español"
+	},
+	{
+		"code": "ar-MA",
+		"title": "Arabic (عربي)"
+	},
+	{
+		"code": "fr-FR",
+		"title": "French (France)"
+	}
+]

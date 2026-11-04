@@ -32,6 +32,33 @@ class KnowledgeService:
             raise NotFoundError("KnowledgeBase", id)
         return kb
 
+    def get_accessible(self, id: str, user_id: str):
+        """Fetch a knowledge base and verify ownership or course enrollment access."""
+        from data.models import ClassroomMember, Course
+
+        kb = self.get(id)
+        if kb.user_id == user_id:
+            return kb
+
+        # If knowledge base is linked to a course, check if user is teacher or enrolled student
+        course = self.repo.db.query(Course).filter(Course.knowledge_id == id).first()
+        if course:
+            if course.teacher_id == user_id:
+                return kb
+            is_enrolled = (
+                self.repo.db.query(ClassroomMember)
+                .filter(
+                    ClassroomMember.classroom_id == course.classroom_id,
+                    ClassroomMember.user_id == user_id,
+                )
+                .first()
+                is not None
+            )
+            if is_enrolled:
+                return kb
+
+        raise NotFoundError("KnowledgeBase", id)
+
     def get_owned(self, id: str, user_id: str):
         """Fetch a knowledge base and verify ownership."""
         kb = self.get(id)
@@ -77,7 +104,7 @@ class KnowledgeService:
         return self.repo.delete(id)
 
     def get_with_files(self, id: str, user_id: str) -> dict:
-        kb = self.get_owned(id, user_id)
+        kb = self.get_accessible(id, user_id)
         files = self.repo.list_files(id)
         d = kb.to_dict()
         d["files"] = [f.to_dict() for f in files]

@@ -4,6 +4,7 @@ Admin-only: config read/write, embedding, reranking, reset.
 Verified user: template, query settings, process/*, query/*.
 """
 
+import logging
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -16,6 +17,7 @@ from data.models import User
 from gateway.http.dependencies import get_current_user
 
 router = APIRouter(prefix="/retrieval", tags=["retrieval"])
+log = logging.getLogger(__name__)
 
 
 def _svc(db: Session = Depends(get_db)) -> RetrievalService:
@@ -58,6 +60,7 @@ class RAGConfigUpdateRequest(BaseModel):
     content_extraction: Optional[ContentExtractionConfig] = None
     youtube: Optional[YoutubeConfig] = None
     file: Optional[FileConfig] = None
+    web: Optional[dict] = None
 
 
 class QuerySettingsRequest(BaseModel):
@@ -99,7 +102,7 @@ def update_config(
 ):
     _require_admin(user)
     data = body.model_dump(exclude_none=True)
-    for key in ("chunk", "content_extraction", "youtube", "file"):
+    for key in ("chunk", "content_extraction", "youtube", "file", "web"):
         if key in data and hasattr(data[key], "model_dump"):
             data[key] = data[key].model_dump(exclude_none=True)
     return svc.update_config(data)
@@ -142,14 +145,22 @@ def update_reranking(
 
 
 @router.post("/reset/uploads")
-def reset_uploads(user: User = Depends(get_current_user)):
+def reset_uploads(
+    user: User = Depends(get_current_user),
+    svc: RetrievalService = Depends(_svc),
+):
     _require_admin(user)
+    svc.reset_uploads()
     return {"status": "ok"}
 
 
 @router.post("/reset/db")
-def reset_vector_db(user: User = Depends(get_current_user)):
+def reset_vector_db(
+    user: User = Depends(get_current_user),
+    svc: RetrievalService = Depends(_svc),
+):
     _require_admin(user)
+    svc.reset_vector_db()
     return {"status": "ok"}
 
 
@@ -180,30 +191,83 @@ def update_query_settings(
 
 
 @router.post("/process/file")
-def process_file(body: dict, user: User = Depends(get_current_user)):
-    return {"status": "ok", "file_id": body.get("file_id")}
+def process_file(
+    body: dict,
+    user: User = Depends(get_current_user),
+    svc: RetrievalService = Depends(_svc),
+):
+    file_id = body.get("file_id")
+    collection_name = body.get("collection_name")
+    if not file_id:
+        raise HTTPException(status_code=400, detail="file_id is required")
+    try:
+        return svc.process_file(file_id, collection_name)
+    except Exception as exc:
+        log.warning("File processing error: %s", exc)
+        return {"status": False, "file_id": file_id, "detail": str(exc)}
 
 
 @router.post("/process/youtube")
-def process_youtube(body: dict, user: User = Depends(get_current_user)):
+def process_youtube(
+    body: dict,
+    user: User = Depends(get_current_user),
+    svc: RetrievalService = Depends(_svc),
+):
+    # YouTube audio/transcript processing
     return {"status": "ok", "url": body.get("url")}
 
 
 @router.post("/process/web")
-def process_web(body: dict, user: User = Depends(get_current_user)):
-    return {"status": "ok", "url": body.get("url")}
+async def process_web(
+    body: dict,
+    user: User = Depends(get_current_user),
+    svc: RetrievalService = Depends(_svc),
+):
+    url = body.get("url")
+    collection_name = body.get("collection_name")
+    if not url:
+        raise HTTPException(status_code=400, detail="url is required")
+    try:
+        return await svc.process_web(url, collection_name)
+    except Exception as exc:
+        log.warning("Web processing error: %s", exc)
+        return {"status": False, "url": url, "detail": str(exc)}
+
 
 
 @router.post("/process/web/search")
-def process_web_search(body: dict, user: User = Depends(get_current_user)):
-    return {"status": "ok", "query": body.get("query")}
+async def process_web_search(
+    body: dict,
+    user: User = Depends(get_current_user),
+    svc: RetrievalService = Depends(_svc),
+):
+    query = body.get("query")
+    collection_name = body.get("collection_name")
+    if not query:
+        raise HTTPException(status_code=400, detail="query is required")
+    return await svc.process_web_search(query, collection_name)
 
 
 @router.post("/query/doc")
-def query_doc(body: dict, user: User = Depends(get_current_user)):
-    return {"results": []}
+def query_doc(
+    body: dict,
+    user: User = Depends(get_current_user),
+    svc: RetrievalService = Depends(_svc),
+):
+    collection_name = body.get("collection_name", "")
+    query = body.get("query", "")
+    k = body.get("k")
+    return svc.query_doc(collection_name, query, k)
 
 
 @router.post("/query/collection")
-def query_collection(body: dict, user: User = Depends(get_current_user)):
-    return {"results": []}
+def query_collection(
+    body: dict,
+    user: User = Depends(get_current_user),
+    svc: RetrievalService = Depends(_svc),
+):
+    collection_names = body.get("collection_names", [])
+    query = body.get("query", "")
+    k = body.get("k")
+    return svc.query_collection(collection_names, query, k)
+

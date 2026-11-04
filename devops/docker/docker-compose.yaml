@@ -3,17 +3,48 @@ networks:
     driver: bridge
 
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: tutorai-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: tutorai
+      POSTGRES_PASSWORD: tutorai_password
+      POSTGRES_DB: tutorai
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tutorai -d tutorai"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   open-tutorai:
     build:
       context: ../..
       dockerfile: devops/docker/Dockerfile.backend
     image: open-tutorai
     container_name: open-tutorai
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
     ports:
       - "8080:8080"
     working_dir: /app
     volumes:
       - ../../var:/app/var
+      - ../../gateway:/app/gateway
+      - ../../learning:/app/learning
+      - ../../data:/app/data
+      - ../../ai:/app/ai
+      - ../../common:/app/common
+      - ../../config:/app/config
+      - ../../accounts:/app/accounts
     env_file:
       - ../../.env
     # Mapping syntax avoids YAML list-parsing issues with interpolation strings.
@@ -21,6 +52,7 @@ services:
     # a message that includes the generation command.
     environment:
       PYTHONUNBUFFERED: "1"
+      DATABASE_URL: "${DATABASE_URL:-postgresql://tutorai:tutorai_password@postgres:5432/tutorai}"
       OLLAMA_BASE_URL: "http://ollama:11434"
       SECRET_KEY: "${SECRET_KEY:?SECRET_KEY must be set in .env. Generate one with: echo SECRET_KEY=$(openssl rand -hex 32) >> .env}"
     networks:
@@ -44,3 +76,4 @@ services:
 
 volumes:
   ollama:
+  postgres_data:

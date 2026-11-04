@@ -1,0 +1,569 @@
+=== PAGE 1 ===
+ 
+ESPECIFICACIÓN FUNCIONAL Y PEDAGÓGICA  
+Plataforma adaptativa para el aprendizaje de Matemática  
+TEMA PILOTO · TEOREMA DE PITÁGORAS  
+Documento de implementación para el equipo de desarrollo · Versión 2.4 (con mockups de reportes)  
+Responsable s pedagógico s: Diego Rodríguez  y Gabriela Jácome  
+ 
+=== PAGE 2 ===
+1. Propósito y alcance  
+Definir con precisión qué debe construir el equipo de desarrollo, qué debe ocurrir en cada pantalla, cómo 
+debe responder la plataforma a las acciones del estudiante y qué decisiones corresponden exclusivamente al 
+diseño pedagógico. El documento es autosufi ciente: no debe requerir conversaciones previas para ser 
+interpretado.  
+1.1 Tema piloto  
+El tema seleccionado es Teorema de Pitágoras, por su carácter visual, su bajo número de prerrequisitos y su 
+capacidad para demostrar una secuencia pedagógica completa.  
+1.2 Nivel curricular de referencia  
+Educación General Básica Superior. La arquitectura debe permitir aplicar posteriormente el mismo sistema a 
+otros niveles y temas sin rehacerlo.  
+1.3 Modalidad  
+• Apoyo al aprendizaje presencial.  
+• Experiencia autónoma o virtual.  
+• Recurso de práctica y seguimiento posterior a una clase.  
+1.4 Plataformas soportadas  
+El demo debe funcionar correctamente en computador, tableta y teléfono.  
+1.5 Qué debe demostrar el demo  
+1. Que existe una secuencia pedagógica explícita y reusable.  
+2. Que el contenido no aparece de forma espontánea ni desconectada.  
+3. Que el estudiante puede recibir apoyos distintos sin ser etiquetado mediante estilos de aprendizaje.  
+4. Que el sistema puede adaptar la práctica según el desempeño.  
+5. Que el conocimiento puede descomponerse en microcompetencias medibles.  
+6. Que el docente puede observar resultados individuales y grupales con suficiente detalle para tomar 
+decisiones pedagógicas.  
+ 
+ALCANCE TÉCNICO  
+No es necesario implementar todavía el motor adaptativo definitivo. Sí es obligatorio construir el demo de 
+manera que dicho motor pueda sustituirse posteriormente sin rehacer las pantallas ni la estructura de los 
+temas.  
+2. Arquitectura pedagógica universal  
+Cada tema deberá conservar la misma estructura general. El contenido cambia; la arquitectura no.  
+Etapa  Pregunta que responde  Función  
+CONECTA  ¿Para qué necesito esto?  Presenta una situación que genera la 
+necesidad matemática, sin exigir que 
+=== PAGE 3 ===
+Etapa  Pregunta que responde  Función  
+el estudiante conozca todavía el 
+procedimiento.  
+COMPRENDE  ¿Por qué funciona?  Construye significado mediante 
+representación, explicación y 
+formalización progresiva; 
+predominantemente visual.  
+RESUELVE  ¿Puedo hacerlo?  Presenta práctica adaptativa hasta 
+obtener evidencia suficiente de 
+dominio.  
+ 
+OBLIGATORIO  
+Ningún tema debe iniciar con una fórmula o definición formal. La formalización aparece después de que la 
+experiencia haya construido la necesidad y el significado matemático.  
+2.1 Cuatro componentes independientes del sistema  
+Deben mantenerse conceptualmente separados aunque interactúen entre sí.  
+Componente  Pregunta que responde  
+Ruta pedagógica  ¿Qué debe aprender el estudiante y en qué secuencia? Es la 
+secuencia conceptual oficial del tema; no depende del docente ni 
+del comportamiento de un estudiante particular.  
+Motor de dominio  ¿Cuánto necesita practicar? Determina el estado de cada 
+microcompetencia con base en evidencia acumulada, y decide 
+cuándo mantener, aumentar o disminuir la dificultad.  
+Motor de experiencia  ¿Cómo conviene presentárselo? Registra qué apoyos e interacciones 
+resultan eficaces (pistas, representaciones, repeticiones, tiempo). 
+No asigna etiquetas rígidas de estilo de aprendizaje.  
+Capa docente  ¿Con qué enfoque o material adicional practicará? El docente 
+observa, asigna, complementa y analiza; la plataforma entrega la 
+ruta curricular base.  
+2.2 Independencia entre temas  
+Cada tema deberá poder estudiarse como una unidad independiente:  
+• Pitágoras tendrá su propio CONECTA.  
+• Ley de Senos y Cosenos tendrá su propio CONECTA.  
+• Dominio de funciones tendrá su propio CONECTA.  
+• Ningún tema dependerá narrativamente de haber completado el anterior.  
+Sí se permiten conexiones opcionales entre temas — nunca como prerrequisito obligatorio. Ejemplo al 
+terminar Pitágoras:  
+=== PAGE 4 ===
+CONEXIÓN OPCIONAL (ejemplo)  
+“Ya sabemos comprobar si estas medidas corresponden a un ángulo recto. Pero si la diagonal mide 10,18 
+m, ¿podríamos calcular exactamente el ángulo entre las paredes?” → Explorar Ley de Cosenos.  
+3. Principios de diseño no negociables  
+• Una idea principal por pantalla o estado.  
+• Las representaciones visuales deben utilizarse cuando aporten comprensión real; el texto explica lo 
+necesario, no reemplaza lo que un gráfico puede comunicar mejor.  
+• Las animaciones deben explicar matemática, nunca usarse como decoración.  
+• Volver, repetir, pausar o solicitar apoyo no penaliza al estudiante.  
+• La práctica no tendrá una cantidad fija visible de ejercicios.  
+• El sistema no clasificará al estudiante como “visual”, “auditivo”, “activo”, “reflexivo”, etc.  
+• La interfaz debe ser seria, clara, académica y contemporánea; puede incorporar recursos interactivos, 
+pero no debe depender de gamificación superficial ni tener apariencia infantil.  
+4. Estructura visual de las pantallas  
+Todas las pantallas de aprendizaje deberán conservar cuatro zonas: encabezado con tema/progreso, 
+navegación CONECTA –COMPRENDE –RESUELVE, área principal de contenido, y acciones del estudiante.  
+4.1 Desktop  
+• El contenido debe mantenerse centrado.  
+• Texto y recurso visual pueden presentarse en dos columnas cuando la lectura sea natural.  
+• No utilizar todo el ancho disponible si perjudica la lectura.  
+4.2 Móvil  
+• Una sola columna.  
+• Orden: recurso visual → texto/pregunta → acciones.  
+• Botones suficientemente grandes para interacción táctil.  
+• Las expresiones matemáticas deben escalar sin desbordarse.  
+• Los controles principales deben permanecer accesibles sin cubrir la figura.  
+5. Flujo general del demo  
+Pantalla 0 (Entrada) → Pantalla 1 (CONECTA) → Pantalla 2 (COMPRENDE / entrada). Aquí el estudiante puede 
+elegir “Ya conozco esto”: esto abre una microcomprobación, nunca salta directamente a la práctica. Si 
+demuestra dominio suficiente, avanza a RESUELVE; si no, entra a la demostración geométrica. Tras la 
+demostración, la plataforma regresa al caso inicial (la habitación) y de ahí pasa a RESUELVE.  
+REGLA FUNCIONAL  
+=== PAGE 5 ===
+El botón “YA CONOZCO ESTO” no permite saltar directamente a la práctica sin verificación. Debe abrir una 
+microcomprobación breve.  
+ 
+Figura 1 · Flujo general de pantallas y decisiones del demo.  
+6. Pantallas del demo  
+Pantalla 0 · Entrada  
+Objetivo: presentar el tema sin adelantar la fórmula.  
+Debe verse:  
+• Título: Teorema de Pitágoras.  
+• Subtítulo: “Descubre cómo relacionar las longitudes de un triángulo rectángulo”.  
+• Una ilustración limpia relacionada con el tema.  
+• Botón primario: COMENZAR.  
+No mostrar: fórmula, definición, video introductorio ni explicación previa.  
+Pantalla 1 · CONECTA  
+
+=== PAGE 6 ===
+Visual obligatorio: habitación en construcción, con dos paredes contiguas de 6 m y 8 m, y baldosas del piso 
+que no quedan correctamente alineadas.  
+SITUACIÓN EN PANTALLA  
+Una habitación tiene dos paredes contiguas de 6 m y 8 m. Al colocar las baldosas del piso, estas no 
+quedan correctamente alineadas. Las baldosas están bien cortadas y las longitudes de las paredes son 
+correctas. Surge una sospecha: ¿las paredes forman real mente un ángulo de 90°? No tenemos un 
+instrumento para medir el ángulo. ¿Cómo podríamos comprobarlo utilizando solamente mediciones de 
+longitud?  
+ 
+Interacciones: campo opcional “TENGO UNA IDEA” (la respuesta se guarda como participación, no se califica) 
+y botón primario CONTINUAR.  
+Regla pedagógica: no sugerir previamente “medir la diagonal”. Un estudiante que nunca ha estudiado 
+Pitágoras no tiene por qué descubrir espontáneamente esa estrategia.  
+Después de CONTINUAR: animar la medición de la diagonal y mostrar 10,18 m. Aparece la nueva pregunta: “Si 
+las paredes formaran exactamente 90°, ¿cuánto debería medir esa diagonal?”. Botón primario: DESCUBRIRLO.  
+Pantalla 2 · COMPRENDE / entrada  
+Debe verse: triángulo rectángulo limpio, catetos identificados como a y b, hipotenusa identificada como c, 
+ángulo recto claramente marcado.  
+Acción  Comportamiento  
+VER DEMOSTRACIÓN  Acción principal. Abre la secuencia geométrica por escenas.  
+LEER EXPLICACIÓN  Abre una explicación textual equivalente, sin alterar la 
+secuencia conceptual.  
+ESCUCHAR EXPLICACIÓN  Componente previsto. Puede quedar fuera de la primera 
+implementación funcional.  
+YA CONOZCO ESTO  Abre una microcomprobación; no salta directamente a 
+RESUELVE.  
+Registro: la plataforma registra qué opción utiliza el estudiante, pero una elección aislada no debe producir 
+una clasificación sobre su estilo de aprendizaje.  
+6.1 Microcomprobación de “Ya conozco esto”  
+Es una verificación breve y sin apoyos, distinta de la práctica de RESUELVE: no ofrece pistas ni 
+retroalimentación progresiva, solo registra correcto/incorrecto por ítem.  
+• Cantidad de ítems: 4, uno por cada microcompetencia de entrada al tema — PIT-01 (reconoce un 
+triángulo rectángulo), PIT -02 (identifica catetos e hipotenusa), PIT -06 (calcula la hipotenusa) y PIT -07 
+(calcula un cateto).  
+• Formato: opción múltiple o respuesta corta según el ítem; sin botón PISTA ni acceso a RECORDAR 
+CONCEPTO.  
+• Criterio de aprobación: 3 de 4 ítems correctos. Si aprueba, el sistema registra evidencia inicial (estado 
+“en proceso”) en esas cuatro microcompetencias y envía al estudiante directamente a RESUELVE, nivel 
+Básico — nunca directamente a un nivel superior, i ncluso si aprobó los 4 ítems.  
+=== PAGE 7 ===
+• Si no aprueba (2 correctos o menos): el estudiante ingresa a COMPRENDE (Pantalla 2) de forma normal, 
+con VER DEMOSTRACIÓN como acción principal. Los resultados de la microcomprobación igual quedan 
+registrados como evidencia inicial de esas microcompetencia s, aunque no alcancen el umbral de 
+aprobación.  
+• Un resultado parcial (3 de 4) no distingue todavía cuál ítem falló para personalizar la ruta dentro de 
+COMPRENDE; eso queda fuera del alcance del demo (ver sección 19).  
+ 
+PARAMETRIZABLE  
+La cantidad de ítems y el umbral “3 de 4” son provisionales, igual que las demás reglas de esta 
+especificación marcadas como tales. Deben quedar como parámetros configurables.  
+7. Demostración geométrica: secuencia prescriptiva  
+OBLIGATORIO  
+Esta secuencia es prescriptiva. No sustituirla por una demostración diferente. La deducción se realiza 
+mediante copia, rotación y reordenamiento de cuatro triángulos rectángulos congruentes hasta formar un 
+cuadrado exterior con un cuadrado interior.  
+ 
+Controles disponibles durante toda la demostración, sin cubrir la figura: ANTERIOR · REPRODUCIR/PAUSAR · 
+SIGUIENTE · REPETIR.  
+Escena 1 · Triángulo base  
+• Triángulo rectángulo con catetos a y b, hipotenusa c, ángulo recto marcado.  
+• Representación limpia, sin ecuaciones todavía.  
+ 
+Figura 2 · Escena 1 — triángulo rectángulo base.  
+Escena 2 · Formación del cuadrado  
+• Crear una copia del triángulo; desplazarla y rotarla hasta su posición.  
+
+=== PAGE 8 ===
+• Repetir hasta obtener cuatro triángulos congruentes que formen un cuadrado exterior y dejen un 
+cuadrado interior.  
+• Las etiquetas a, b y c deben permanecer vinculadas al segmento correcto durante toda la animación.  
+ 
+Figura 3 · Secuencia de armado — el triángulo original, cada copia añadida y el arreglo completo con el cuadrado interior ya visible.  
+ 
+Figura 4 · Esquema geométrico objetivo — el resultado final, con las etiquetas a, b y c.  
+Escena 3 · Área del cuadrado exterior  
+• Resaltar un lado exterior y mostrar a + b; resaltar el lado perpendicular y mostrar lo mismo.  
+• Mostrar progresivamente A = (a + b)(a + b) y luego A = (a + b)².  
+Escena 4 · Área mediante las figuras internas  
+• Resaltar un triángulo: A △ = ab/2. Resaltar los cuatro triángulos: 4(ab/2) = 2ab.  
+• Reducir el énfasis de los triángulos y resaltar el cuadrado central (lado c): A = c².  
+• Por tanto: A = 2ab + c².  
+Escena 5 · Igualación y deducción  
+• Mostrar secuencialmente: (a + b)² = 2ab + c², luego a² + 2ab + b² = 2ab + c².  
+
+=== PAGE 9 ===
+• Los dos términos 2ab deben resaltarse simultáneamente y cancelarse visualmente.  
+• Aparece a² + b² = c². Solo en ese momento mostrar el rótulo “Teorema de Pitágoras” y una definición 
+breve.  
+ 
+Figura 5 · Escenas 3 a 5 — las dos formas de calcular la misma área y la igualación que produce a² + b² = c².  
+ 
+REGLA FUNCIONAL  
+Cada expresión matemática debe aparecer al mismo tiempo que se resalta en la figura el segmento, 
+región o construcción que representa. No mostrar álgebra desconectada de la representación geométrica.  
+8. Regreso al caso inicial  
+Después de la deducción, la plataforma regresa a la habitación presentada en CONECTA y resuelve 
+visualmente: 6² + 8² = c² → 36 + 64 = c² → c = 10 m.  
+Valor  Interpretación  
+Diagonal esperada: 10,00 m  Si el ángulo fuera exactamente 90°.  
+Diagonal medida: 10,18 m  Medición real en la habitación.  
+Conclusión en pantalla: las medidas no corresponden a un triángulo rectángulo; por tanto, las paredes no 
+forman exactamente un ángulo de 90°. Botón primario: PRACTICAR.  
+9. RESUELVE: práctica adaptativa  
+9.1 Niveles de dificultad  
+Nivel  Obligatorio  Qué evalúa  Criterio  
+Básico  Sí Aplicación directa  Hipotenusa o cateto 
+desconocido.  
+
+=== PAGE 10 ===
+Nivel  Obligatorio  Qué evalúa  Criterio  
+Intermedio  Sí Interpretación  Contexto en el que debe 
+decidir cómo usar Pitágoras.  
+Avanzado  Sí Modelación  El esquema matemático no 
+se entrega completamente.  
+Desafío  No Problema no rutinario  No condiciona el dominio 
+del tema.  
+9.2 Regla provisional del demo  
+1. El estudiante recibe un ejercicio del nivel actual.  
+2. Si responde correctamente sin ayuda, recibe otro ejercicio equivalente del mismo nivel.  
+3. Dos respuestas correctas consecutivas y sin ayuda permiten avanzar provisionalmente al siguiente nivel.  
+4. Una respuesta incorrecta mantiene al estudiante en el nivel y se presenta un problema equivalente, pero 
+no idéntico.  
+5. Dos errores dentro del nivel activan apoyo adicional (retroalimentación progresiva).  
+6. Una respuesta correcta después de utilizar una pista constituye evidencia parcial.  
+7. No existe un máximo pedagógico de ejercicios.  
+8. Al completar el nivel Avanzado, el tema puede marcarse como en vías de DOMINADO (sujeto al modelo 
+de la sección 11).  
+ 
+Figura 6 · Lógica de avance y apoyo dentro de un mismo nivel de RESUELVE.  
+
+=== PAGE 11 ===
+ 
+PARAMETRIZABLE  
+La regla “dos correctos consecutivos / dos fallos” se usa únicamente para demostrar el funcionamiento 
+del demo. Debe implementarse como parámetro reemplazable, no como lógica permanente del producto.  
+9.3 Formato de cada ejercicio  
+• Enunciado claro.  
+• Gráfico solo cuando aporte información.  
+• Campo de respuesta y unidad cuando corresponda.  
+• Botón COMPROBAR.  
+• Botón PISTA.  
+• Opción VER/RECORDAR CONCEPTO sin abandonar el ejercicio.  
+• Indicador discreto del nivel actual.  
+9.4 Retroalimentación progresiva  
+Apoyo  Acción  
+Nivel 1  Pista conceptual.  
+Nivel 2  Señalamiento específico o representación visual.  
+Nivel 3  Ejemplo análogo resuelto o solución guiada.  
+Cuando sea posible, el sistema clasificará el error como: conceptual, modelación, algebraico o aritmético. 
+Ejemplo: si el estudiante plantea correctamente c² = 6² + 8² pero calcula mal 8², la retroalimentación debe 
+centrarse en ese cálculo y no enviarlo nu evamente a aprender el teorema completo.  
+10. Banco mínimo del demo  
+10.1 Básico  
+• Hipotenusa desconocida.  
+• Cateto desconocido.  
+• Datos variables para evitar memorización.  
+10.2 Intermedio  
+EJEMPLO  
+Una barra diagonal une dos puntos separados horizontalmente 4,8 m y verticalmente 7,2 m. ¿Qué 
+longitud mínima debe tener la barra?  
+10.3 Avanzado  
+EJEMPLO  
+=== PAGE 12 ===
+Una escalera debe alcanzar una ventana situada a 3,06 m de altura. Por seguridad, la base debe colocarse 
+a 4,20 m de la pared. ¿Qué longitud mínima debe tener la escalera? (No indicar al estudiante que debe 
+utilizar Pitágoras.)  
+10.4 Desafío opcional: el estanque  
+PROBLEMA  
+Un estanque tiene 10 m de ancho. Una planta acuática nace exactamente en el centro del fondo. Cuando 
+está completamente vertical, sobresale 1 m por encima de la superficie del agua. Si se inclina hacia 
+cualquiera de los bordes, su extremo coincide exactame nte con el borde a nivel de la superficie. ¿Cuál es 
+la longitud total de la planta?  
+ 
+Lógica esperada: x² + 5² = (x + 1)² → x = 12 m (profundidad). La planta mide x + 1 = 13 m.  
+NO ACEPTAR  
+12 m no es la respuesta final: corresponde a la profundidad, no a la longitud de la planta. El estudiante 
+puede calcular correctamente la profundidad y aun así no haber respondido la pregunta planteada.  
+11. Microcompetencias del tema  
+El sistema no debe resumir todo el conocimiento en una única nota. El tema se descompone en 
+microcompetencias observables:  
+Código  Microcompetencia  
+PIT-01 Reconoce un triángulo rectángulo.  
+PIT-02 Identifica catetos e hipotenusa.  
+PIT-03 Comprende el significado geométrico de elevar una longitud al cuadrado en el 
+contexto de áreas.  
+PIT-04 Comprende la deducción del teorema mediante el reordenamiento de cuatro 
+triángulos congruentes.  
+PIT-05 Interpreta la relación a² + b² = c².  
+PIT-06 Calcula la hipotenusa.  
+PIT-07 Calcula un cateto.  
+PIT-08 Reconoce cuándo corresponde aplicar el teorema en una situación contextual.  
+PIT-09 Modela y resuelve una situación aplicada.  
+PIT-10 Verifica si tres longitudes pueden corresponder a un triángulo rectángulo.  
+12. Modelo de medición del conocimiento  
+=== PAGE 13 ===
+12.1 Estados de una microcompetencia  
+• No explorado: no existe ningún registro de interacción con esa microcompetencia. No tiene un valor de D 
+— el índice solo se calcula una vez que hay evidencia.  
+• En proceso: existen registros, pero la evidencia es parcial o inconsistente (D bajo).  
+• Aprendido: resuelve la microcompetencia durante la experiencia guiada con evidencia suficiente (D en el 
+rango medio).  
+• Aprendido, pendiente de verificación: alcanza el índice más alto (D en el rango superior) dentro de la 
+misma experiencia guiada, pero todavía no ha sido puesto a prueba en una sesión distinta o en un 
+contexto diferente.  
+• Dominado: solo se alcanza después de que una verificación posterior — en otra sesión, o en una 
+situación distinta a la practicada — resulta exitosa. El valor de D por sí solo nunca produce este estado.  
+• Requiere revisión: una habilidad previamente Dominada muestra pérdida o fragilidad en una 
+comprobación posterior.  
+ 
+OBLIGATORIO  
+“Dominado” no es un umbral de D. Es el resultado de una verificación posterior exitosa. Un D alto solo 
+habilita que el sistema programe esa verificación; no la sustituye.  
+12.2 Qué datos deben registrarse  
+Por cada interacción relevante, como mínimo: microcompetencia asociada, ejercicio o recurso presentado, 
+respuesta, resultado correcto/incorrecto, número de intento, uso de pista y tipo de pista, si resolvió con o sin 
+apoyo, nivel de dificultad, tiempo acti vo como dato complementario, desempeño antes y después de un 
+apoyo, fecha y hora, y cambio de estado de la microcompetencia si lo hubiera.  
+OBLIGATORIO  
+El tiempo, el número de clics o la elección de un recurso nunca serán por sí solos evidencia de dominio. El 
+dominio debe depender principalmente de desempeño matemático verificable.  
+12.3 Índice provisional de dominio  
+Para el demo puede utilizarse un índice numérico interno D ∈ [0, 100] por microcompetencia, calculado 
+únicamente a partir del momento en que existe al menos un registro de interacción. No debe presentarse 
+como verdad psicométrica definitiva; funciona como mecanismo provisional para demostrar la lógica del 
+sistema.  
+D = 0.55R + 0.20I + 0.15A + 0.10V, donde R = rendimiento reciente, I = independencia (desempeño sin pistas), 
+A = desempeño en nivel superior o situación transferida, V = verificación posterior o recuperación del 
+conocimiento.  
+PARAMETRIZABLE  
+Los pesos, umbrales y fórmula del índice son provisionales. Deben almacenarse como parámetros 
+configurables y sustituibles sin rehacer la interfaz ni la estructura de datos.  
+12.4 Umbrales provisionales  
+=== PAGE 14 ===
+Condición  Estado sugerido  Acción  
+Sin registros de interacción  No explorado  Presentar experiencia inicial.  
+Con registros; D entre 1 y 59  En proceso  Continuar práctica y apoyos.  
+D entre 60 y 79  Aprendido  Consolidar y transferir.  
+D entre 80 y 100 (aún sin 
+verificación posterior)  Aprendido, pendiente de 
+verificación  Programar una verificación 
+posterior, en otra sesión o 
+contexto distinto.  
+Verificación posterior exitosa  Dominado  Avanzar; queda disponible como 
+prerrequisito para otras 
+microcompetencias.  
+Verificación posterior fallida 
+sobre una habilidad Dominada  Requiere revisión  Revisar y reforzar antes de 
+reintentar la verificación.  
+13. Adaptación de la experiencia y DUA  
+La adaptación no se limita a modificar la dificultad de los ejercicios. La plataforma trabaja simultáneamente 
+con dos preguntas: ¿qué necesita practicar y cuánto? (adaptación del dominio) y ¿qué forma de acceso o 
+apoyo está resultando eficaz? (adaptación d e la experiencia).  
+13.1 Opciones en COMPRENDE  
+• Demostración geométrica animada.  
+• Explicación escrita.  
+• Explicación narrada.  
+• Repetición de la animación, con control de pausa y retroceso.  
+• Opción de ir directamente a practicar (tras microcomprobación).  
+13.2 Opciones en RESUELVE  
+• Pista textual.  
+• Pista visual.  
+• Ejemplo similar.  
+• Acceso rápido al concepto.  
+ 
+PERFIL DINÁMICO  
+El objetivo futuro es identificar qué recursos parecen favorecer el aprendizaje de cada estudiante. No se 
+debe concluir, a partir de una acción aislada, que un estudiante pertenece a un estilo de aprendizaje 
+específico.  
+14. Sistema de reportes  
+=== PAGE 15 ===
+14.1 Vista del estudiante  
+• Progreso general del tema.  
+• Estado de cada microcompetencia.  
+• Qué está listo para aprender a continuación.  
+• Qué requiere revisión.  
+• Evolución del dominio en el tiempo.  
+ 
+REGLA FUNCIONAL  
+Una microcompetencia se considera “lista para aprender” cuando todos sus prerrequisitos están en 
+estado Aprendido, Aprendido pendiente de verificación, o Dominado, y ella misma todavía no ha sido 
+Dominada.  
+ 
+Mapa de prerrequisitos entre microcompetencias para el demo: el orden PIT -01 a PIT -05 es secuencial (cada 
+una requiere la anterior); PIT -06 y PIT -07 son paralelas y ambas requieren PIT -05; PIT -08 requiere PIT -06 y PIT -
+07; PIT -09 requiere PIT -08; PIT -10 req uiere PIT -06 y PIT -07. 
+14.2 Vista del docente: resumen de clase  
+La pantalla inicial del docente debe permitir interpretar la situación del grupo en pocos segundos: número de 
+estudiantes, dominio medio, cuántos requieren apoyo, cuántos están listos para avanzar (valores ilustrativos 
+en el diseño).  
+ 
+Figura 7 · Tarjetas de resumen de clase — cifras ilustrativas.  
+14.3 Gráfico principal de clase: barras por microcompetencia  
+El gráfico de barras es preferible al circular para comparar niveles de dominio entre microcompetencias 
+(porcentaje de estudiantes con dominio, una barra por cada PIT -0X). 
+
+=== PAGE 16 ===
+ 
+Figura 8 · Gráfico de barras por microcompetencia — datos ilustrativos. El color solo señala el rango (verde ≥80, naranja 60 -79); el 
+docente ve el número exacto en cada barra.  
+14.4 Matriz de dominio de la clase  
+Una fila por estudiante, una columna por microcompetencia, con una escala visual de estados (no explorado / 
+en proceso / aprendido / aprendido pendiente de verificación / dominado / requiere revisión). Debe permitir 
+abrir el detalle al seleccionar una celd a. 
+ 
+Figura 9 · Matriz de dominio de la clase — datos ilustrativos, con la escala de color de los seis estados.  
+14.5 Detalle al seleccionar una microcompetencia  
+Ejemplo, al seleccionar PIT -07: número y porcentaje de estudiantes dominados, estudiantes en proceso, 
+estudiantes que requieren apoyo, estudiantes todavía no evaluados, errores frecuentes detectados y lista de 
+estudiantes por cada estado.  
+14.6 Vista individual del docente  
+
+=== PAGE 17 ===
+La ficha de un estudiante debe incluir: dominio global del tema, mapa de microcompetencias, evolución 
+temporal, ejercicios resueltos con y sin apoyo, intentos promedio, pistas utilizadas, recursos consultados, 
+errores frecuentes y habilidades que requieren  revisión.  
+14.7 Gráfico de evolución individual  
+Dominio a lo largo de las sesiones (diagnóstico → sesión 1 → sesión 2 → sesión 3 → verificación).  
+ 
+Figura 10 · Evolución individual del dominio — datos ilustrativos. La línea punteada marca el umbral que habilita programar una 
+verificación.  
+14.8 Uso de gráficos circulares  
+Un gráfico circular puede utilizarse únicamente cuando represente una composición real de un total (ej. 
+distribución de estados de una clase en una microcompetencia concreta). No debe utilizarse como 
+visualización principal para comparar múltiples habilida des. 
+ 
+Figura 11 · Ejemplo válido de gráfico circular — distribución de estados de la clase para una sola microcompetencia (PIT -06). 
+15. Rol del docente y módulo docente  
+
+=== PAGE 18 ===
+OBLIGATORIO  
+La plataforma debe entregar una ruta curricular oficial ya diseñada. El docente no construye desde cero el 
+syllabus ni la secuencia conceptual para poder utilizar el sistema.  
+ 
+El docente podrá: asignar temas o prácticas; observar progreso individual y grupal; añadir documentos y 
+actividades complementarias; proponer ejercicios adicionales; adaptar contexto o énfasis; revisar antes de 
+publicar material generado automáticamente en  futuras versiones.  
+El docente no podrá, por defecto: sustituir automáticamente la ruta conceptual oficial; alterar criterios 
+pedagógicos centrales sin permisos específicos; cambiar el significado de los estados de dominio.  
+15.1 Visión futura del módulo docente (fuera del alcance del primer demo)  
+La arquitectura debe prever que, más adelante, el docente pueda cargar material propio (PDF, 
+presentaciones, syllabus, guías, bancos de ejercicios, deberes, evaluaciones anteriores) y que la plataforma: 
+analice el material, identifique posibles temas y hab ilidades, muestre al docente lo detectado, permita 
+seleccionar qué desea generar, genere práctica, permita revisión antes de asignarla, y utilice posteriormente 
+el mismo motor adaptativo.  
+PRINCIPIO DE PRODUCTO  
+La plataforma define la ruta pedagógica. El profesor puede personalizar la práctica, los contextos y los 
+énfasis. El material del profesor no podrá sustituir automáticamente definiciones, propiedades 
+fundamentales o criterios de dominio establecidos por la  plataforma.  
+16. Registro mínimo de eventos  
+Evento  Datos mínimos  Uso 
+topic_started  estudiante, tema, fecha/hora  Inicio y progreso.  
+microcheck_completed  ítems, aciertos, aprobado/no 
+aprobado  Resultado de “Ya conozco 
+esto”.  
+resource_opened  recurso, tipo, etapa  Perfil de experiencia.  
+resource_repeated  recurso, repetición  Necesidad de apoyo.  
+exercise_presented  id, microcompetencia, nivel  Trazabilidad.  
+answer_submitted  respuesta, resultado, intento  Evidencia de dominio.  
+hint_requested  tipo, intento  Apoyo utilizado.  
+exercise_completed  resultado, ayudas  Efectividad.  
+level_changed  origen, destino, motivo  Adaptación.  
+skill_state_changed  microcompetencia, estado anterior, 
+estado nuevo, evidencia  Historial del conocimiento.  
+topic_mastered  tema, evidencia  Progreso global.  
+=== PAGE 19 ===
+17. Estados que el demo debe contemplar  
+• Carga de contenido.  
+• Respuesta vacía.  
+• Respuesta numérica con coma o punto decimal.  
+• Unidad equivalente.  
+• Respuesta correcta.  
+• Respuesta incorrecta.  
+• Animación reiniciada.  
+• Usuario vuelve a una pantalla anterior.  
+• Usuario solicita “Ya conozco esto”.  
+• Microcomprobación aprobada o no aprobada.  
+• Estudiante que salta COMPRENDE.  
+• Abandono y reanudación de sesión.  
+• Banco temporalmente sin más ejercicios.  
+• Error de conexión sin pérdida del progreso ya registrado.  
+En ningún caso un estado previsto debe mostrar al estudiante un error técnico sin tratamiento.  
+18. Criterios de aceptación  
+El demo se considerará pedagógicamente aprobado únicamente si cumple:  
+1. Un estudiante nuevo comprende por qué necesita Pitágoras sin conocer previamente la fórmula, y 
+CONECTA no depende de conocimientos previos del teorema.  
+2. La secuencia CONECTA –COMPRENDE –RESUELVE es visible y coherente.  
+3. La demostración geométrica se ejecuta mediante los cuatro triángulos congruentes y no mediante otra 
+demostración; puede comprenderse sin que un profesor tenga que explicarla externamente.  
+4. Cada expresión algebraica se vincula visualmente con la figura correspondiente.  
+5. “YA CONOZCO ESTO” abre una comprobación y no permite saltar sin evidencia.  
+6. El estudiante puede repetir o saltar explicaciones.  
+7. La práctica avanza por desempeño, no por una cantidad fija de ejercicios.  
+8. Los errores activan apoyos progresivos.  
+9. El sistema registra evidencia por microcompetencia y diferencia los cinco estados (no explorado, en 
+proceso, aprendido, dominado, requiere revisión).  
+10. El docente dispone de vista de clase e individual, con comparación por microcompetencia, matriz de 
+dominio y evolución temporal.  
+11. El sistema no asigna estilos de aprendizaje rígidos.  
+12. La interfaz funciona correctamente en escritorio, tableta y móvil.  
+13. Las reglas provisionales de adaptación y dominio pueden modificarse sin rehacer las pantallas.  
+14. El Desafío es opcional y el problema del estanque reconoce como respuesta final 13 m (no 12 m).  
+19. Fuera de alcance de la primera entrega  
+=== PAGE 20 ===
+FUERA DE ALCANCE DEL DEMO  
+Motor psicométrico definitivo · Inteligencia artificial definitiva para generación automática de rutas · 
+Clasificación por estilos de aprendizaje o inteligencias múltiples · Panel administrativo completo · 
+Gamificación compleja, rankings o recompensas · Im plementación de todos los temas del currículo · 
+Importación automática completa desde syllabus, PDF o presentaciones · Validación científica definitiva 
+de los pesos del índice de dominio.  
+20. Entregables solicitados al equipo de desarrollo  
+1. Prototipo funcional responsive del tema Teorema de Pitágoras.  
+2. Flujo completo CONECTA –COMPRENDE –RESUELVE.  
+3. Animación geométrica de la deducción exactamente según esta especificación.  
+4. Microcomprobación para “YA CONOZCO ESTO”.  
+5. Banco mínimo de ejercicios: Básico, Intermedio, Avanzado y Desafío.  
+6. Lógica adaptativa provisional parametrizada.  
+7. Registro de eventos.  
+8. Cálculo provisional del estado de cada microcompetencia.  
+9. Vista de progreso del estudiante.  
+10. Dashboard docente de clase.  
+11. Ficha individual de estudiante.  
+12. Gráfico de barras por microcompetencia.  
+13. Matriz de dominio del grupo.  
+14. Gráfico de evolución individual.  
+15. Documento técnico de parámetros y estructura de datos.  
+21. Regla de decisión durante el desarrollo  
+DECISIONES PEDAGÓGICAS  
+Si surge una decisión que cambie el orden pedagógico, el tipo de retroalimentación, la dificultad, la forma 
+de presentar el concepto, la progresión del estudiante, la medición del dominio o el significado de un dato 
+registrado, no debe resolverse por conve niencia técnica. Debe volver a definición pedagógica.  
+ 
+DECISIONES TÉCNICAS  
+Arquitectura de software, rendimiento, persistencia, estructura de componentes, API, base de datos y 
+demás decisiones puramente técnicas corresponden al equipo de desarrollo, siempre que no alteren las 
+reglas pedagógicas definidas en este documento.  
+ 
+Fin de la especificación · Versión 2.4 (con mockups de reportes)  

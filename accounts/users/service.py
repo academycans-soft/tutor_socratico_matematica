@@ -81,6 +81,71 @@ class AccountService:
             return False
 
     def delete_user(self, user_id: str) -> bool:
+        session = self.repo.session
+        from sqlalchemy import inspect, text
+        try:
+            inspector = inspect(session.bind)
+            existing_tables = set(inspector.get_table_names())
+
+            def safe_delete(tbl: str, col: str, val: str):
+                if tbl in existing_tables:
+                    session.execute(text(f"DELETE FROM {tbl} WHERE {col} = :val"), {"val": val})
+
+            def safe_update(tbl: str, col: str, new_val: Optional[str], match_val: str):
+                if tbl in existing_tables:
+                    if new_val:
+                        session.execute(
+                            text(f"UPDATE {tbl} SET {col} = :nval WHERE {col} = :mval"),
+                            {"nval": new_val, "mval": match_val},
+                        )
+                    else:
+                        session.execute(
+                            text(f"UPDATE {tbl} SET {col} = NULL WHERE {col} = :mval"),
+                            {"mval": match_val},
+                        )
+
+            # 1. Clean learning states, events and submissions
+            safe_delete("student_skill_states", "user_id", user_id)
+            safe_delete("pedagogical_events", "user_id", user_id)
+            safe_delete("submissions", "student_id", user_id)
+            safe_delete("classroom_members", "user_id", user_id)
+
+            # 2. Clean parental links, supports, feedbacks, chats
+            if "parent_students" in existing_tables:
+                session.execute(
+                    text("DELETE FROM parent_students WHERE parent_id = :uid OR student_id = :uid"),
+                    {"uid": user_id},
+                )
+            safe_delete("supports", "user_id", user_id)
+            safe_delete("feedbacks", "user_id", user_id)
+            safe_delete("chats", "user_id", user_id)
+
+            # 3. Handle teacher/author owned entities
+            admin_user = (
+                session.execute(
+                    text("SELECT id FROM users WHERE is_admin = true AND id != :uid LIMIT 1"),
+                    {"uid": user_id},
+                ).scalar()
+                if "users" in existing_tables
+                else None
+            )
+
+            if admin_user:
+                safe_update("classrooms", "teacher_id", admin_user, user_id)
+                safe_update("courses", "teacher_id", admin_user, user_id)
+                safe_update("assignments", "teacher_id", admin_user, user_id)
+                safe_update("curriculum_topics", "author_id", admin_user, user_id)
+            else:
+                safe_delete("classrooms", "teacher_id", user_id)
+                safe_delete("courses", "teacher_id", user_id)
+                safe_delete("assignments", "teacher_id", user_id)
+                safe_update("curriculum_topics", "author_id", None, user_id)
+
+            session.flush()
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning("Error cleaning user dependencies for %s: %s", user_id, e)
+
         return self.repo.delete(user_id)
 
     def get_user_settings(self, user_id: str) -> dict:

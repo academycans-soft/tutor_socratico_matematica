@@ -66,8 +66,8 @@ WORKDIR /app
 ENV HOME=/root
 
 RUN if [ $UID -ne 0 ]; then \
-        if [ $GID -ne 0 ]; then addgroup --gid $GID app; fi; \
-        adduser --uid $UID --gid $GID --home $HOME --disabled-password --no-create-home app; \
+    if [ $GID -ne 0 ]; then addgroup --gid $GID app; fi; \
+    adduser --uid $UID --gid $GID --home $HOME --disabled-password --no-create-home app; \
     fi
 
 RUN mkdir -p $HOME/.cache/chroma && \
@@ -76,18 +76,18 @@ RUN mkdir -p $HOME/.cache/chroma && \
 RUN chown -R $UID:$GID /app $HOME
 
 RUN if [ "$USE_OLLAMA" = "true" ]; then \
-        apt-get update && \
-        apt-get install -y --no-install-recommends git build-essential pandoc netcat-openbsd curl jq && \
-        apt-get install -y --no-install-recommends gcc python3-dev && \
-        apt-get install -y --no-install-recommends ffmpeg libsm6 libxext6 && \
-        curl -fsSL https://ollama.com/install.sh | sh && \
-        rm -rf /var/lib/apt/lists/*; \
+    apt-get update && \
+    apt-get install -y --no-install-recommends git build-essential pandoc netcat-openbsd curl jq && \
+    apt-get install -y --no-install-recommends gcc python3-dev && \
+    apt-get install -y --no-install-recommends ffmpeg libsm6 libxext6 && \
+    curl -fsSL https://ollama.com/install.sh | sh && \
+    rm -rf /var/lib/apt/lists/*; \
     else \
-        apt-get update && \
-        apt-get install -y --no-install-recommends git build-essential pandoc gcc netcat-openbsd curl jq && \
-        apt-get install -y --no-install-recommends gcc python3-dev && \
-        apt-get install -y --no-install-recommends ffmpeg libsm6 libxext6 && \
-        rm -rf /var/lib/apt/lists/*; \
+    apt-get update && \
+    apt-get install -y --no-install-recommends git build-essential pandoc gcc netcat-openbsd curl jq && \
+    apt-get install -y --no-install-recommends gcc python3-dev && \
+    apt-get install -y --no-install-recommends ffmpeg libsm6 libxext6 && \
+    rm -rf /var/lib/apt/lists/*; \
     fi
 
 # Install Python dependencies
@@ -95,11 +95,11 @@ COPY --chown=$UID:$GID ./requirements.txt ./requirements.txt
 
 RUN pip3 install uv && \
     if [ "$USE_CUDA" = "true" ]; then \
-        pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/$USE_CUDA_DOCKER_VER --no-cache-dir && \
-        uv pip install --system -r requirements.txt --no-cache-dir; \
+    pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/$USE_CUDA_DOCKER_VER --no-cache-dir && \
+    uv pip install --system -r requirements.txt --no-cache-dir; \
     else \
-        pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu --no-cache-dir && \
-        uv pip install --system -r requirements.txt --no-cache-dir; \
+    pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu --no-cache-dir && \
+    uv pip install --system -r requirements.txt --no-cache-dir; \
     fi && \
     mkdir -p /app/var/cache && chown -R $UID:$GID /app/var/
 
@@ -120,3 +120,4 @@ ENV TUTORAI_BUILD_HASH=${BUILD_HASH}
 ENV DOCKER=true
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+

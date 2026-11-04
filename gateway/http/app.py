@@ -24,6 +24,9 @@ from .routers import (
     users,
 )
 from .routers import (
+    assignments as assignments_router,
+)
+from .routers import (
     audio as audio_router,
 )
 from .routers import (
@@ -33,8 +36,21 @@ from .routers import (
     chats as chats_router,
 )
 from .routers import (
+    classrooms as classrooms_router,
+)
+from .routers import (
     configs as configs_router,
 )
+from .routers import (
+    courses as courses_router,
+)
+from .routers import (
+    curriculum as curriculum_router,
+)
+from .routers import (
+    math_lms as math_lms_router,
+)
+
 from .routers import (
     folders as folders_router,
 )
@@ -55,6 +71,9 @@ from .routers import (
 )
 from .routers import (
     models as models_router,
+)
+from .routers import (
+    parents as parents_router,
 )
 from .routers import (
     prompts as prompts_router,
@@ -79,11 +98,22 @@ class SPAStaticFiles(StaticFiles):
     """Serve SvelteKit SPA — fall back to index.html for unknown routes."""
 
     async def get_response(self, path: str, scope):
+        clean_path = path.lstrip("/").lower()
+        if (
+            clean_path.startswith("api")
+            or clean_path.startswith("auths")
+            or clean_path.startswith("health")
+        ):
+            raise HTTPException(status_code=404, detail="API route not found")
         try:
             return await super().get_response(path, scope)
         except (HTTPException, StarletteHTTPException) as ex:
             if ex.status_code == 404:
-                if path.endswith(".js"):
+                if (
+                    path.endswith(".js")
+                    or clean_path.startswith("api")
+                    or clean_path.startswith("auths")
+                ):
                     raise ex
                 return await super().get_response("index.html", scope)
             raise ex
@@ -164,6 +194,13 @@ def create_app() -> FastAPI:
     app.include_router(groups_router.router, prefix="/api/v1")
     app.include_router(folders_router.router, prefix="/api/v1")
     app.include_router(tasks_router.router, prefix="/api/v1")
+    app.include_router(classrooms_router.router, prefix="/api/v1")
+    app.include_router(courses_router.router, prefix="/api/v1")
+    app.include_router(assignments_router.router, prefix="/api/v1")
+    app.include_router(parents_router.router, prefix="/api/v1")
+    app.include_router(curriculum_router.router, prefix="/api/v1")
+    app.include_router(math_lms_router.router, prefix="/api/v1")
+
 
     # Socket.IO — mounted at /realtime; client uses path='/realtime/socket.io'
     app.mount("/realtime", socket_app)

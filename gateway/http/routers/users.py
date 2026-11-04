@@ -1,9 +1,12 @@
 from typing import Any, Dict, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
+from sqlalchemy.orm import Session
 
+from accounts.groups.service import GroupsService
 from accounts.users.service import AccountService
+from data.database import get_db
 from data.models import User
 from gateway.http.dependencies import get_account_service, get_current_user
 
@@ -15,6 +18,14 @@ class RoleUpdateRequest(BaseModel):
     role: str
 
 
+class UserCreateRequest(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
+    role: str = "student"
+    profile_image_url: Optional[str] = None
+
+
 class UserUpdateRequest(BaseModel):
     name: Optional[str] = None
     email: Optional[str] = None
@@ -22,6 +33,7 @@ class UserUpdateRequest(BaseModel):
     is_active: Optional[bool] = None
 
 
+@router.get("", include_in_schema=False)
 @router.get("/")
 async def get_users(
     skip: int = 0,
@@ -32,6 +44,29 @@ async def get_users(
     if not current_user.is_admin:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin only")
     return [u.to_dict() for u in svc.list_users(skip=skip, limit=limit)]
+
+
+@router.post("", status_code=status.HTTP_201_CREATED, include_in_schema=False)
+@router.post("/", status_code=status.HTTP_201_CREATED)
+async def create_user(
+    body: UserCreateRequest,
+    current_user: User = Depends(get_current_user),
+    svc: AccountService = Depends(get_account_service),
+):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin only")
+    try:
+        user = svc.create_user(
+            email=body.email,
+            name=body.name,
+            password_plain=body.password,
+            profile_image_url=body.profile_image_url,
+            is_admin=(body.role == "admin"),
+            role=body.role or "student",
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
+    return user.to_dict()
 
 
 @router.get("/all")
@@ -45,8 +80,10 @@ async def get_all_users(
 
 
 @router.get("/groups")
-async def get_user_groups(current_user: User = Depends(get_current_user)):
-    return []
+async def get_user_groups(
+    current_user: User = Depends(get_current_user), db: Session = Depends(get_db)
+):
+    return [g.to_dict() for g in GroupsService(db).list_groups(current_user)]
 
 
 @router.get("/user/settings")

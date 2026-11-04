@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import JSON, Boolean, Column, DateTime, String
+from sqlalchemy import JSON, Boolean, Column, DateTime, String, Text
 from sqlalchemy.orm import relationship
 
 from data.database import Base
@@ -19,7 +19,7 @@ class User(Base):
     password_hash = Column(String(255), nullable=False)
     is_active = Column(Boolean, default=True)
     is_admin = Column(Boolean, default=False)
-    profile_image_url = Column(String(255), nullable=True)
+    profile_image_url = Column(Text, nullable=True)
     settings = Column(JSON, nullable=True)
     info = Column(JSON, nullable=True)
     role = Column(String(50), nullable=True, default="user")
@@ -31,6 +31,16 @@ class User(Base):
     # Relationships
     supports = relationship("Support", back_populates="user")
     feedbacks = relationship("Feedback", back_populates="user")
+
+    @property
+    def is_teacher_manager(self) -> bool:
+        """Returns True if user has permissions to author/manage curriculum."""
+        return bool(self.is_admin or (self.role in ["admin", "teacher_manager"]))
+
+    @property
+    def is_teacher(self) -> bool:
+        """Returns True if user is a teacher or teacher_manager or admin."""
+        return bool(self.is_admin or (self.role in ["admin", "teacher_manager", "teacher"]))
 
     def to_dict(self) -> dict:
         """Convert user to dictionary."""
@@ -48,6 +58,8 @@ class User(Base):
             "is_admin": self.is_admin,
             "profile_image_url": self.profile_image_url or "/user.png",
             "role": self.role or "user",
+            "is_teacher_manager": self.is_teacher_manager,
+            "is_teacher": self.is_teacher,
             "settings": self.settings,
             "info": self.info,
             "created_at": created_ts,

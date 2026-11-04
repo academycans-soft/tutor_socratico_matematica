@@ -21,6 +21,7 @@ class Settings:
     APP_NAME: str = "OpenTutorAI"
     APP_VERSION: str = "1.0.0"
     BUILD_HASH: str = os.getenv("TUTORAI_BUILD_HASH", "dev-build")
+    DEFAULT_LOCALE: str = os.getenv("DEFAULT_LOCALE", "es-ES")
 
     # API configuration
     DEBUG: bool = os.getenv("DEBUG", "false").lower() == "true"
